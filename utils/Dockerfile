@@ -5,7 +5,7 @@ MAINTAINER Joaquim Pedro Silveira <pedroxs@gmail.com>
 ENV LANG=C.UTF-8
 
 RUN apt-get update \
-	&& apt-get install -y dnsutils wget curl git vim lynx ldap-utils mysql-client \
+	&& apt-get install -y dnsutils wget curl git vim lynx ldap-utils mysql-client mongodb-org-shell mongodb-org-tools \
 	&& echo "deb http://debian.datastax.com/community stable main" | tee -a /etc/apt/sources.list.d/cassandra.sources.list \
 	&& curl -L http://debian.datastax.com/debian/repo_key | apt-key add - \
 	&& apt-get update \
