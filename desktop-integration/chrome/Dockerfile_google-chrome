@@ -1,0 +1,46 @@
+docker build -t firefox - << __EOF__
+#FROM java:8-jre
+#FROM tifayuki/java:8
+FROM ubuntu:14.04
+RUN adduser --disabled-password --gecos '' chrome \
+  && adduser chrome sudo \
+  && adduser chrome video \
+  && adduser chrome audio \
+  && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+RUN apt-get update -qqy \
+  && apt-get -qqy --no-install-recommends install \
+  ca-certificates \
+  ca-certificates-java \
+  openjdk-7-jre \
+  icedtea-7-plugin \
+  sudo \
+  wget
+RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
+  && echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list
+RUN apt-get update -qqy \
+  && apt-get -qqy --no-install-recommends install \
+  fonts-ipafont-gothic \
+  xfonts-100dpi \
+  xfonts-75dpi \
+  xfonts-cyrillic \
+  xfonts-scalable
+RUN apt-get -qqy update \
+  && apt-get -qqy install \
+  dbus-X11 \
+  google-chrome-stable \
+  firefox \
+  libcanberra-gtk-module \
+  libexif-dev
+#  libcanberra-gtk3-module \
+#  libgl1-mesa-dri \
+#  fluxbox
+# ENV DISPLAY :0
+USER chrome
+WORKDIR /home/chrome
+#CMD google-chrome
+CMD firefox
+__EOF__
+XSOCK=/tmp/.X11-unix
+XAUTH=/tmp/.docker.xauth
+xauth nlist :0 | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
+docker run --rm -ti -v $XSOCK:$XSOCK -v $XAUTH:$XAUTH -e XAUTHORITY=$XAUTH chrome
